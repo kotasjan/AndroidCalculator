@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Kalkulačka</string>
+    <string name="ok">OK</string>
+    <string name="error_title">Chyba</string>
+    <string name="error1">Dělení nulou!</string>
+</resources>
