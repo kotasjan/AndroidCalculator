@@ -1,52 +1,63 @@
 package com.jankotas.calculator;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Vibrator;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import android.widget.Toast;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import static com.jankotas.mathlib.MathLib.mod;
 import static com.jankotas.mathlib.MathLib.div;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    /*
-        number - hlavni cast displeje
-        exponent - cast displeje zorazujici exponent
-        xTen - pro dlouha nebo prilis mala/velka cisla se cislo vyjadri skrz exponent ve tvaru 10^EXP
-    */
+    private DrawerLayout mDrawerLayout;
 
-    TextView number, exponent, xTen;
+    private ActionBarDrawerToggle mToggle;
+
+    private AdView mAdView;
+
+    private TextView result_text, x10;
+
+    private EditText equation_text;
 
     /*
         Tlacitka kalkulacky
      */
 
-    Button but_sin, but_cos, but_tan, but_ln, but_xn, but_square, but_root, but_exp, but_ac, but_del,
-            but_plus, but_minus, but_seven, but_eight, but_nine, but_multiply, but_four, but_five,
-            but_six, but_divide, but_one, but_two, but_three, but_modulo, but_zero, but_comma, but_sign,
-            but_equal;
+    private Button btn_dots, btn_sin, btn_cos, btn_tan, btn_abs, btn_pi, btn_xn, btn_x2, btn_sqrt, btn_brackets, btn_seven, btn_eight, btn_nine, btn_clear, btn_mul, btn_four, btn_five, btn_six, btn_div, btn_one, btn_two, btn_three, btn_plus, btn_minus, btn_zero, btn_sign, btn_comma, btn_mod, btn_equal;
+
+    private ImageButton btn_backspace;
 
     /*
         vibrator - vibrace pri zmacknuti tlacitka
      */
 
-    Vibrator vibrator;
+    private Vibrator vibrator;
 
     /*
         Fonty pro zobrazovani digitalnich cislic
      */
 
-    Typeface digital_font, digital_font_monospaced;
+    private Typeface digital_font, digital_font_monospaced, noto_font_light;
 
     /*
         strNum - retezec slouzici k nastavovani hlavniho ciselniku kalkulacky
@@ -54,108 +65,122 @@ public class MainActivity extends AppCompatActivity {
         operator - slouzi k vyhodnocovani prepinace pro volbu matematicke operace
      */
 
-    String strNum, strExp, operator = "";
+    private String strNum, strExp, operator = "";
 
     /*
         firstNum - slouzi k vyjadreni prvniho operandu
         secondNum - slouzi k vyjadreni druheho operandu
      */
 
-    Number firstNum, secondNum;
+    private Number firstNum, secondNum;
 
     /*
         error - pokud nastane pri operaci chyba, nastavi se na "true"
         isResult - pokud je na displeji zobrazovan vysledek, je nastaveno na "true"
      */
 
-    Boolean error = false, isInit = false, isResult = false;
+    private Boolean error = false, isInit = false, isResult = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
 
-        number = findViewById(R.id.number);
-        exponent = findViewById(R.id.exponent);
-        xTen = findViewById(R.id.xTen);
+        mDrawerLayout = findViewById(R.id.calculator);
+        mToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.open, R.string.close);
+        mDrawerLayout.addDrawerListener(mToggle);
+        mToggle.syncState();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        NavigationView navigationView = findViewById(R.id.navigationView);
+        navigationView.setNavigationItemSelectedListener(this);
 
-        but_sin = findViewById(R.id.but_sin);
-        but_cos = findViewById(R.id.but_cos);
-        but_tan = findViewById(R.id.but_tan);
-        but_ln = findViewById(R.id.but_ln);
+        MobileAds.initialize(this, "ca-app-pub-3879739495024729~5243751307");
 
-        but_xn = findViewById(R.id.but_xn);
-        but_square =  findViewById(R.id.but_square);
-        but_root = findViewById(R.id.but_root);
-        but_exp = findViewById(R.id.but_exp);
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
-        but_ac = findViewById(R.id.but_ac);
-        but_del = findViewById(R.id.but_del);
-        but_plus = findViewById(R.id.but_plus);
-        but_minus = findViewById(R.id.but_minus);
+        equation_text = findViewById(R.id.equation_text);
+        result_text = findViewById(R.id.result_text);
+        x10 = findViewById(R.id.x10_text);
 
-        but_seven = findViewById(R.id.but_seven);
-        but_eight = findViewById(R.id.but_eight);
-        but_nine = findViewById(R.id.but_nine);
-        but_multiply = findViewById(R.id.but_multiply);
+        btn_dots = findViewById(R.id.btn_dots);
+        btn_sin = findViewById(R.id.btn_sin);
+        btn_cos = findViewById(R.id.btn_cos);
+        btn_tan = findViewById(R.id.btn_tan);
+        btn_abs = findViewById(R.id.btn_abs);
 
-        but_four = findViewById(R.id.but_four);
-        but_five = findViewById(R.id.but_five);
-        but_six = findViewById(R.id.but_six);
-        but_divide = findViewById(R.id.but_divide);
+        btn_pi = findViewById(R.id.btn_pi);
+        btn_xn = findViewById(R.id.btn_xn);
+        btn_x2 = findViewById(R.id.btn_x2);
+        btn_sqrt = findViewById(R.id.btn_sqrt);
+        btn_brackets = findViewById(R.id.btn_brackets);
 
-        but_one = findViewById(R.id.but_one);
-        but_two = findViewById(R.id.but_two);
-        but_three = findViewById(R.id.but_three);
-        but_modulo = findViewById(R.id.but_modulo);
+        btn_seven = findViewById(R.id.btn_seven);
+        btn_eight = findViewById(R.id.btn_eight);
+        btn_nine = findViewById(R.id.btn_nine);
+        btn_clear = findViewById(R.id.btn_clear);
 
-        but_zero = findViewById(R.id.but_zero);
-        but_comma = findViewById(R.id.but_comma);
-        but_sign = findViewById(R.id.but_sign);
-        but_equal = findViewById(R.id.but_equal);
+        btn_four = findViewById(R.id.btn_four);
+        btn_five = findViewById(R.id.btn_five);
+        btn_six = findViewById(R.id.btn_six);
+        btn_mul = findViewById(R.id.btn_mul);
+        btn_div = findViewById(R.id.btn_div);
+
+        btn_one = findViewById(R.id.btn_one);
+        btn_two = findViewById(R.id.btn_two);
+        btn_three = findViewById(R.id.btn_three);
+        btn_plus = findViewById(R.id.btn_plus);
+        btn_minus = findViewById(R.id.btn_minus);
+
+        btn_zero = findViewById(R.id.btn_zero);
+        btn_sign = findViewById(R.id.btn_sign);
+        btn_comma = findViewById(R.id.btn_comma);
+        btn_mod = findViewById(R.id.btn_mod);
+        btn_equal = findViewById(R.id.btn_equal);
 
         digital_font = Typeface.createFromAsset(getAssets(), "fonts/digital-7.regular.ttf");
         digital_font_monospaced = Typeface.createFromAsset(getAssets(), "fonts/digital-7.mono.ttf");
+        noto_font_light = Typeface.createFromAsset(getAssets(), "fonts/NotoSansDisplay-Light.ttf");
 
-        number.setTypeface(digital_font_monospaced);
-        exponent.setTypeface(digital_font);
-        xTen.setTypeface(digital_font);
+        equation_text.setTypeface(digital_font);
+        result_text.setTypeface(digital_font_monospaced);
+        x10.setTypeface(digital_font);
 
-        but_sin.setTypeface(digital_font);
-        but_cos.setTypeface(digital_font);
-        but_tan.setTypeface(digital_font);
-        but_ln.setTypeface(digital_font);
+        btn_dots.setTypeface(noto_font_light);
+        btn_sin.setTypeface(noto_font_light);
+        btn_cos.setTypeface(noto_font_light);
+        btn_tan.setTypeface(noto_font_light);
+        btn_abs.setTypeface(noto_font_light);
 
-        but_xn.setTypeface(digital_font);
-        but_square.setTypeface(digital_font);
-        but_root.setTypeface(digital_font);
-        but_exp.setTypeface(digital_font);
+        btn_pi.setTypeface(noto_font_light);
+        btn_xn.setTypeface(noto_font_light);
+        btn_x2.setTypeface(noto_font_light);
+        btn_sqrt.setTypeface(noto_font_light);
+        btn_brackets.setTypeface(noto_font_light);
 
-        but_ac.setTypeface(digital_font);
-        but_del.setTypeface(digital_font);
-        but_plus.setTypeface(digital_font);
-        but_minus.setTypeface(digital_font);
+        btn_seven.setTypeface(noto_font_light);
+        btn_eight.setTypeface(noto_font_light);
+        btn_nine.setTypeface(noto_font_light);
+        btn_clear.setTypeface(noto_font_light);
 
-        but_seven.setTypeface(digital_font);
-        but_eight.setTypeface(digital_font);
-        but_nine.setTypeface(digital_font);
-        but_multiply.setTypeface(digital_font);
+        btn_four.setTypeface(noto_font_light);
+        btn_five.setTypeface(noto_font_light);
+        btn_six.setTypeface(noto_font_light);
+        btn_mul.setTypeface(noto_font_light);
+        btn_div.setTypeface(noto_font_light);
 
-        but_four.setTypeface(digital_font);
-        but_five.setTypeface(digital_font);
-        but_six.setTypeface(digital_font);
-        but_divide.setTypeface(digital_font);
+        btn_one.setTypeface(noto_font_light);
+        btn_two.setTypeface(noto_font_light);
+        btn_three.setTypeface(noto_font_light);
+        btn_plus.setTypeface(noto_font_light);
+        btn_minus.setTypeface(noto_font_light);
 
-        but_one.setTypeface(digital_font);
-        but_two.setTypeface(digital_font);
-        but_three.setTypeface(digital_font);
-        but_modulo.setTypeface(digital_font);
-
-        but_zero.setTypeface(digital_font);
-        but_comma.setTypeface(digital_font);
-        but_sign.setTypeface(digital_font);
-        but_equal.setTypeface(digital_font);
+        btn_zero.setTypeface(noto_font_light);
+        btn_sign.setTypeface(noto_font_light);
+        btn_comma.setTypeface(noto_font_light);
+        btn_mod.setTypeface(noto_font_light);
+        btn_equal.setTypeface(noto_font_light);
 
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
@@ -163,30 +188,59 @@ public class MainActivity extends AppCompatActivity {
         secondNum = new Number();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (mToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.home) {
+            Toast.makeText(this, "Home", Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.settings) {
+            Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show();
+        }
+        return false;
+    }
+
+    public void onClickListener_history(View v){
+        //TODO vyskakovaci okno se seznamem vysledku
+    }
+
     /* Numbers listeners */
 
     public void onClickListener_Zero(View v) {
-        strNum = number.getText().toString();
+        strNum = result_text.getText().toString();
 
         if (!strNum.equals("0") && (strNum.length() < 9 || (strNum.length() < 10 && strNum.charAt(0) == '-')) && !isInit) {
             strNum = strNum + "0";
-            number.setText(strNum);
+            result_text.setText(strNum);
         } else if (strNum.equals("0") || isInit) {
             strNum = "0";
             isInit = false;
-            number.setText(strNum);
+            result_text.setText(strNum);
         }
-        if(isResult) {
+        if (isResult) {
             operator = "";
             isResult = false;
         }
-        xTen.setText("");
-        exponent.setText("");
+        x10.setText("");
 
     }
 
     public void onClickListener_One(View v) {
-        strNum = number.getText().toString();
+        strNum = result_text.getText().toString();
 
         if (!strNum.equals("0") && (strNum.length() < 9 || (strNum.length() < 10 && strNum.charAt(0) == '-')) && !isInit) {
             strNum = strNum + "1";
@@ -194,17 +248,16 @@ public class MainActivity extends AppCompatActivity {
             strNum = "1";
             isInit = false;
         }
-        if(isResult) {
+        if (isResult) {
             operator = "";
             isResult = false;
         }
-        number.setText(strNum);
-        xTen.setText("");
-        exponent.setText("");
+        result_text.setText(strNum);
+        x10.setText("");
     }
 
     public void onClickListener_Two(View v) {
-        strNum = number.getText().toString();
+        strNum = result_text.getText().toString();
 
         if (!strNum.equals("0") && (strNum.length() < 9 || (strNum.length() < 10 && strNum.charAt(0) == '-')) && !isInit) {
             strNum = strNum + "2";
@@ -212,17 +265,16 @@ public class MainActivity extends AppCompatActivity {
             strNum = "2";
             isInit = false;
         }
-        if(isResult) {
+        if (isResult) {
             operator = "";
             isResult = false;
         }
-        number.setText(strNum);
-        xTen.setText("");
-        exponent.setText("");
+        result_text.setText(strNum);
+        x10.setText("");
     }
 
     public void onClickListener_Three(View v) {
-        strNum = number.getText().toString();
+        strNum = result_text.getText().toString();
 
         if (!strNum.equals("0") && (strNum.length() < 9 || (strNum.length() < 10 && strNum.charAt(0) == '-')) && !isInit) {
             strNum = strNum + "3";
@@ -230,17 +282,16 @@ public class MainActivity extends AppCompatActivity {
             strNum = "3";
             isInit = false;
         }
-        if(isResult) {
+        if (isResult) {
             operator = "";
             isResult = false;
         }
-        number.setText(strNum);
-        xTen.setText("");
-        exponent.setText("");
+        result_text.setText(strNum);
+        x10.setText("");
     }
 
     public void onClickListener_Four(View v) {
-        strNum = number.getText().toString();
+        strNum = result_text.getText().toString();
 
         if (!strNum.equals("0") && (strNum.length() < 9 || (strNum.length() < 10 && strNum.charAt(0) == '-')) && !isInit) {
             strNum = strNum + "4";
@@ -248,17 +299,16 @@ public class MainActivity extends AppCompatActivity {
             strNum = "4";
             isInit = false;
         }
-        if(isResult) {
+        if (isResult) {
             operator = "";
             isResult = false;
         }
-        number.setText(strNum);
-        xTen.setText("");
-        exponent.setText("");
+        result_text.setText(strNum);
+        x10.setText("");
     }
 
     public void onClickListener_Five(View v) {
-        strNum = number.getText().toString();
+        strNum = result_text.getText().toString();
 
         if (!strNum.equals("0") && (strNum.length() < 9 || (strNum.length() < 10 && strNum.charAt(0) == '-')) && !isInit) {
             strNum = strNum + "5";
@@ -266,17 +316,16 @@ public class MainActivity extends AppCompatActivity {
             strNum = "5";
             isInit = false;
         }
-        if(isResult) {
+        if (isResult) {
             operator = "";
             isResult = false;
         }
-        number.setText(strNum);
-        xTen.setText("");
-        exponent.setText("");
+        result_text.setText(strNum);
+        x10.setText("");
     }
 
     public void onClickListener_Six(View v) {
-        strNum = number.getText().toString();
+        strNum = result_text.getText().toString();
 
         if (!strNum.equals("0") && (strNum.length() < 9 || (strNum.length() < 10 && strNum.charAt(0) == '-')) && !isInit) {
             strNum = strNum + "6";
@@ -284,17 +333,16 @@ public class MainActivity extends AppCompatActivity {
             strNum = "6";
             isInit = false;
         }
-        if(isResult) {
+        if (isResult) {
             operator = "";
             isResult = false;
         }
-        number.setText(strNum);
-        xTen.setText("");
-        exponent.setText("");
+        result_text.setText(strNum);
+        x10.setText("");
     }
 
     public void onClickListener_Seven(View v) {
-        strNum = number.getText().toString();
+        strNum = result_text.getText().toString();
 
         if (!strNum.equals("0") && (strNum.length() < 9 || (strNum.length() < 10 && strNum.charAt(0) == '-')) && !isInit) {
             strNum = strNum + "7";
@@ -302,17 +350,16 @@ public class MainActivity extends AppCompatActivity {
             strNum = "7";
             isInit = false;
         }
-        if(isResult) {
+        if (isResult) {
             operator = "";
             isResult = false;
         }
-        number.setText(strNum);
-        xTen.setText("");
-        exponent.setText("");
+        result_text.setText(strNum);
+        x10.setText("");
     }
 
     public void onClickListener_Eight(View v) {
-        strNum = number.getText().toString();
+        strNum = result_text.getText().toString();
 
         if (!strNum.equals("0") && (strNum.length() < 9 || (strNum.length() < 10 && strNum.charAt(0) == '-')) && !isInit) {
             strNum = strNum + "8";
@@ -320,17 +367,16 @@ public class MainActivity extends AppCompatActivity {
             strNum = "8";
             isInit = false;
         }
-        if(isResult) {
+        if (isResult) {
             operator = "";
             isResult = false;
         }
-        number.setText(strNum);
-        xTen.setText("");
-        exponent.setText("");
+        result_text.setText(strNum);
+        x10.setText("");
     }
 
     public void onClickListener_Nine(View v) {
-        strNum = number.getText().toString();
+        strNum = result_text.getText().toString();
 
         if (!strNum.equals("0") && (strNum.length() < 9 || (strNum.length() < 10 && strNum.charAt(0) == '-')) && !isInit) {
             strNum = strNum + "9";
@@ -338,17 +384,16 @@ public class MainActivity extends AppCompatActivity {
             strNum = "9";
             isInit = false;
         }
-        if(isResult) {
+        if (isResult) {
             operator = "";
             isResult = false;
         }
-        number.setText(strNum);
-        xTen.setText("");
-        exponent.setText("");
+        result_text.setText(strNum);
+        x10.setText("");
     }
 
     public void onClickListener_Comma(View v) {
-        strNum = number.getText().toString();
+        strNum = result_text.getText().toString();
 
         if (!strNum.contains(".") && (strNum.length() < 9 || (strNum.length() < 10 && strNum.charAt(0) == '-')) && !isInit) {
             strNum = strNum + ".";
@@ -356,19 +401,21 @@ public class MainActivity extends AppCompatActivity {
             strNum = "0.";
             isInit = false;
         }
-        if(isResult) {
+        if (isResult) {
             operator = "";
             isResult = false;
         }
-        number.setText(strNum);
-        xTen.setText("");
-        exponent.setText("");
+        result_text.setText(strNum);
+        x10.setText("");
     }
 
     /* ----------------- */
 
 
     /* Function listeners */
+
+    public void onClickListener_Dots(View view) {
+    }
 
     public void onClickListener_Sin(View v) {
 
@@ -382,7 +429,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void onClickListener_Ln(View v) {
+    public void onClickListener_Abs(View v) {
+
+    }
+
+    public void onClickListener_Pi(View v) {
 
     }
 
@@ -390,15 +441,31 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void onClickListener_Square(View v) {
+    public void onClickListener_X2(View v) {
 
     }
 
-    public void onClickListener_Root(View v) {
+    public void onClickListener_Sqrt(View v) {
 
     }
 
-    public void onClickListener_Exp(View v) {
+    public void onClickListener_Brackets(View v) {
+
+    }
+
+    public void onClickListener_Clear(View v) {
+
+    }
+
+    public void onClickListener_Backspace(View v) {
+
+    }
+
+    public void onClickListener_Multiply(View v) {
+
+    }
+
+    public void onClickListener_Divide(View v) {
 
     }
 
@@ -410,101 +477,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void onClickListener_Multiply(View v) {
-
-    }
-
-    public void onClickListener_Divide(View v) {
-        if (!operator.equals("") && !isResult) {
-            secondNum.setNumber(new BigDecimal(number.getText().toString()));                       // nastavit hodnotu druheho operandu na hodnotu z displeje
-            Equal();
-        } else if (isResult){
-            secondNum.resetNum();
-            isResult = false;
-        }
-
-        if (!firstNum.isInit()) {                                                                   // pokud neni prvni operand inicializovany
-            firstNum.setNumber(new BigDecimal(number.getText().toString()));                        // nastavit hodnotu prvniho operandu na hodnotu z displeje
-        }
-        isResult = false;
-        isInit = true;
-        operator = "div";
-    }
-
-    public void onClickListener_Modulo(View v) {
-        if (!operator.equals("") && !isResult) {
-            secondNum.setNumber(new BigDecimal(number.getText().toString()));                       // nastavit hodnotu druheho operandu na hodnotu z displeje
-            Equal();
-        }
-
-        if (!firstNum.isInit()) {                                                                   // pokud neni prvni operand inicializovany
-            firstNum.setNumber(new BigDecimal(number.getText().toString()));                        // nastavit hodnotu prvniho operandu na hodnotu z displeje
-        }
-
-        secondNum.resetNum();
-        isResult = false;
-        isInit = true;
-        operator = "mod";
-    }
-
     public void onClickListener_Sign(View v) {
 
-        if (isResult || (firstNum.isInit() && !secondNum.isInit() && operator.equals(""))) {
-            Log.d("Kalkulacka", "A");
-            firstNum.setNumber(firstNum.getValue().negate());               // hodnotu firstNum nasobit cislem -1
-            Log.d("Kalkulacka", "firstNum: " + firstNum.getValue());
-            if (firstNum.hasExp()) {                                                                // pokud je cislo upravovane a ma exponent, zobrazime jej na displeji
-                strNum = firstNum.removeZeros(firstNum.getExpValue().toString());
-                strExp = new BigDecimal(firstNum.getExp()).toString();
-                exponent.setText(strExp);
-                xTen.setText("x10");
-            } else {
-                strNum = firstNum.getValue().toString();
-                exponent.setText("");
-                xTen.setText("");
-            }
-        } else if (!firstNum.isInit()) {
-            Log.d("Kalkulacka", "B");
-            firstNum.setNumber(new BigDecimal(number.getText().toString()).negate());   // nastavit hodnotu firstNum na hodnotu z displeje násobenou číslem -1
-            if (firstNum.hasExp()) {                                                                // pokud je cislo upravovane a ma exponent, zobrazime jej na displeji
-                strNum = firstNum.removeZeros(firstNum.getExpValue().toString());
-                strExp = new BigDecimal(firstNum.getExp()).toString();
-                exponent.setText(strExp);
-                xTen.setText("x10");
-            } else {
-                strNum = firstNum.getValue().toString();
-                exponent.setText("");
-                xTen.setText("");
-            }
-        } else if (firstNum.isInit() && !secondNum.isInit() && !operator.equals("")) {
-            Log.d("Kalkulacka", "C");
-            secondNum.setNumber(new BigDecimal(number.getText().toString()).negate());              // nastavit hodnotu secondNum na hodnotu z displeje násobenou číslem -1
-            if (firstNum.hasExp()) {                                                                // pokud je cislo upravovane a ma exponent, zobrazime jej na displeji
-                strNum = secondNum.removeZeros(secondNum.getExpValue().toString());
-                strExp = new BigDecimal(secondNum.getExp()).toString();
-                exponent.setText(strExp);
-                xTen.setText("x10");
-            } else {
-                strNum = secondNum.getValue().toString();
-                exponent.setText("");
-                xTen.setText("");
-            }
-        } else if (firstNum.isInit() && secondNum.isInit() && !operator.equals("")) {
-            Log.d("Kalkulacka", "D");
-            secondNum.setNumber(secondNum.getValue().negate());                                     // hodnotu secondNum nasobit cislem -1
-            if (secondNum.hasExp()) {                                                               // pokud je cislo upravovane a ma exponent, zobrazime jej na displeji
-                strNum = secondNum.removeZeros(secondNum.getExpValue().toString());
-                strExp = new BigDecimal(secondNum.getExp()).toString();
-                exponent.setText(strExp);
-                xTen.setText("x10");
-            } else {
-                strNum = secondNum.getValue().toString();
-                exponent.setText("");
-                xTen.setText("");
-            }
-        }
+    }
 
-        number.setText(strNum);
+    public void onClickListener_Mod(View v) {
+
     }
 
 
@@ -513,128 +491,14 @@ public class MainActivity extends AppCompatActivity {
     /* Other Listeners */
 
     public void onClickListener_Equal(View v) {
-        secondNum.setValue(new BigDecimal(number.getText().toString()));
-        Equal();
+
     }
 
-    public void onClickListener_Ac(View v) {
-        reset();
-    }
 
-    public void reset(){
-        number.setText("0");
-        exponent.setText("");
-        xTen.setText("");
-        operator = "";
-        error = isInit = isResult = false;
-        firstNum.resetNum();
-        secondNum.resetNum();
-    }
-
-    public void onClickListener_Del(View v) {
-        strNum = number.getText().toString();
-
-        if (!strNum.equals("0") && !isInit) {
-            strNum = strNum.substring(0, strNum.length() - 1);
-            if (strNum.length() >= 1 && strNum.charAt(strNum.length() - 1) == '.')
-                strNum = strNum.substring(0, strNum.length() - 1);
-            if (strNum.length() == 0 || strNum.equals("-"))
-                strNum = "0";
-            number.setText(strNum);
-        }
-
-        isInit = false;
-    }
 
     /* --------------- */
 
     /* Other functions */
-
-    public void Equal() {
-        Log.d("Kalkulacka", "operator: " + operator);
-        switch (operator) {
-            case "mod":
-                Log.d("Kalkulacka", "firstNum: " + firstNum.getValue());
-                try {
-                    firstNum.setNumber(mod(firstNum.getValue(), secondNum.getValue()));
-                } catch (IllegalArgumentException e) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                        }
-                    });
-                    builder.setMessage(R.string.error1);
-                    builder.setTitle(R.string.error_title);
-                    AlertDialog errorDialog = builder.create();
-                    errorDialog.show();
-                    error = true;
-                    break;
-                }
-                Log.d("Kalkulacka", "secondNum: " + secondNum.getValue());
-                Log.d("Kalkulacka", "result: " + firstNum.getValue());
-                break;
-            case "pow":
-                BigDecimal pom = firstNum.getValue();
-                int N = Integer.parseInt(number.getText().toString());
-                for (int i = 1; i < N; i++) {
-                    pom = pom.multiply(new BigDecimal(N));
-                }
-                firstNum.setNumber(pom);
-                break;
-            case "pow2":
-                firstNum.setNumber(firstNum.getValue().multiply(firstNum.getValue()));
-                break;
-            case "sqrt":
-
-                break;
-            case "mul":
-
-                break;
-            case "div":
-                try {
-                    firstNum.setNumber(div(firstNum.getValue(), secondNum.getValue()));
-                } catch (Exception e) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                        }
-                    });
-                    builder.setMessage(R.string.error1);
-                    builder.setTitle(R.string.error_title);
-                    AlertDialog errorDialog = builder.create();
-                    errorDialog.show();
-                    error = true;
-                    break;
-                }
-                break;
-            default:
-
-                break;
-        }
-
-        if (!error) {
-            if (firstNum.hasExp()) {
-                strNum = firstNum.removeZeros(firstNum.getExpValue().setScale(8, RoundingMode.FLOOR).toString());
-                if(firstNum.getExp()>1000){
-                    reset();
-                    strNum = "INFINITY";
-                }else{
-                    strExp = Integer.toString(firstNum.getExp());
-                    exponent.setText(strExp);
-                    xTen.setText("x10");
-                }
-            } else {
-                strNum = firstNum.removeZeros(firstNum.getValue().setScale(8, RoundingMode.FLOOR).toString());
-            }
-            isResult = isInit = true;
-        } else {
-            reset();
-        }
-
-        Log.d("Kalkulacka", "str: " + firstNum.getValue().toString());
-
-        number.setText(strNum);
-    }
 
 
     /* --------------- */
