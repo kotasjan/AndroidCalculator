@@ -14,16 +14,4 @@
     <item name="screenBlue" type="color">#3fd4ff</item>
 
 
-    <integer-array name="androidcolors">
-        <item>@color/white</item>
-        <item>@color/black</item>
-        <item>@color/red</item>
-        <item>@color/gray</item>
-        <item>@color/yellow</item>
-        <item>@color/orange</item>
-        <item>@color/blue</item>
-        <item>@color/screenBlue</item>
-
-    </integer-array>
-
 </resources>
