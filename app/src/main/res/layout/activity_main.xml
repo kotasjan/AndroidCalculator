@@ -35,7 +35,7 @@
                 android:inputType="text"
                 android:textColor="@color/black"
                 android:textCursorDrawable="@null"
-                android:textSize="50sp" />
+                android:textSize="@dimen/small_display_text" />
 
 
         </LinearLayout>
@@ -56,21 +56,18 @@
                 android:id="@+id/result_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fontFamily="sans-serif"
                 android:gravity="end|center"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_display_text" />
 
             <TextView
                 android:id="@+id/x10_text"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="40"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:gravity="start|top"
                 android:text="@string/xTen"
                 android:textColor="@color/black"
-                android:textSize="20sp" />◙
-
+                android:textSize="@dimen/small_display_text" />
 
         </LinearLayout>
 
@@ -92,7 +89,7 @@
                 android:onClick="onClickListener_Dots"
                 android:text="@string/dots"
                 android:textColor="@color/white"
-                android:textSize="30sp" />
+                android:textSize="@dimen/small_btn_text" />
 
             <Button
                 android:id="@+id/btn_sin"
@@ -105,7 +102,7 @@
                 android:onClick="onClickListener_Sin"
                 android:text="@string/sin"
                 android:textColor="@color/white"
-                android:textSize="30sp" />
+                android:textSize="@dimen/small_btn_text" />
 
             <Button
                 android:id="@+id/btn_cos"
@@ -118,7 +115,7 @@
                 android:onClick="onClickListener_Cos"
                 android:text="@string/cos"
                 android:textColor="@color/white"
-                android:textSize="30sp" />
+                android:textSize="@dimen/small_btn_text" />
 
             <Button
                 android:id="@+id/btn_tan"
@@ -131,7 +128,7 @@
                 android:onClick="onClickListener_Tan"
                 android:text="@string/tan"
                 android:textColor="@color/white"
-                android:textSize="30sp" />
+                android:textSize="@dimen/small_btn_text" />
 
             <Button
                 android:id="@+id/btn_abs"
@@ -143,7 +140,7 @@
                 android:onClick="onClickListener_Abs"
                 android:text="@string/abs"
                 android:textColor="@color/white"
-                android:textSize="30sp" />
+                android:textSize="@dimen/small_btn_text" />
 
         </LinearLayout>
 
@@ -165,7 +162,7 @@
                 android:onClick="onClickListener_Pi"
                 android:text="@string/pi"
                 android:textColor="@color/white"
-                android:textSize="30sp" />
+                android:textSize="@dimen/small_btn_text" />
 
             <Button
                 android:id="@+id/btn_xn"
@@ -178,7 +175,7 @@
                 android:onClick="onClickListener_Xn"
                 android:text="@string/xn"
                 android:textColor="@color/white"
-                android:textSize="30sp" />
+                android:textSize="@dimen/small_btn_text" />
 
             <Button
                 android:id="@+id/btn_x2"
@@ -191,7 +188,7 @@
                 android:onClick="onClickListener_X2"
                 android:text="@string/x2"
                 android:textColor="@color/white"
-                android:textSize="30sp" />
+                android:textSize="@dimen/small_btn_text" />
 
             <Button
                 android:id="@+id/btn_sqrt"
@@ -204,7 +201,7 @@
                 android:onClick="onClickListener_Sqrt"
                 android:text="@string/sqrt"
                 android:textColor="@color/white"
-                android:textSize="30sp" />
+                android:textSize="@dimen/small_btn_text" />
 
             <Button
                 android:id="@+id/btn_brackets"
@@ -216,7 +213,7 @@
                 android:onClick="onClickListener_Brackets"
                 android:text="@string/brackets"
                 android:textColor="@color/white"
-                android:textSize="30sp" />
+                android:textSize="@dimen/small_btn_text" />
 
         </LinearLayout>
 
@@ -239,7 +236,7 @@
                 android:onClick="onClickListener_Seven"
                 android:text="@string/seven"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
             <Button
                 android:id="@+id/btn_eight"
@@ -252,7 +249,7 @@
                 android:onClick="onClickListener_Eight"
                 android:text="@string/eight"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
             <Button
                 android:id="@+id/btn_nine"
@@ -265,7 +262,7 @@
                 android:onClick="onClickListener_Nine"
                 android:text="@string/nine"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
             <Button
                 android:id="@+id/btn_clear"
@@ -277,7 +274,7 @@
                 android:onClick="onClickListener_Clear"
                 android:text="@string/clear"
                 android:textColor="@color/white"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
             <ImageButton
                 android:id="@+id/btn_backspace"
@@ -286,7 +283,7 @@
                 android:layout_weight="20"
                 android:background="@drawable/btn_red"
                 android:onClick="onClickListener_Backspace"
-                android:padding="17dp"
+                android:padding="@dimen/padding_backspace"
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/ic_backspace_white_24dp" />
 
@@ -310,7 +307,7 @@
                 android:onClick="onClickListener_Four"
                 android:text="@string/four"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
             <Button
                 android:id="@+id/btn_five"
@@ -323,7 +320,7 @@
                 android:onClick="onClickListener_Five"
                 android:text="@string/five"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
             <Button
                 android:id="@+id/btn_six"
@@ -336,7 +333,7 @@
                 android:onClick="onClickListener_Six"
                 android:text="@string/six"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
             <Button
                 android:id="@+id/btn_mul"
@@ -349,7 +346,7 @@
                 android:onClick="onClickListener_Multiply"
                 android:text="@string/multiply"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
             <Button
                 android:id="@+id/btn_div"
@@ -361,7 +358,7 @@
                 android:onClick="onClickListener_Divide"
                 android:text="@string/divide"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
 
         </LinearLayout>
@@ -384,7 +381,7 @@
                 android:onClick="onClickListener_One"
                 android:text="@string/one"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
             <Button
                 android:id="@+id/btn_two"
@@ -397,7 +394,7 @@
                 android:onClick="onClickListener_Two"
                 android:text="@string/two"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
             <Button
                 android:id="@+id/btn_three"
@@ -410,7 +407,7 @@
                 android:onClick="onClickListener_Three"
                 android:text="@string/three"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
             <Button
                 android:id="@+id/btn_plus"
@@ -423,7 +420,7 @@
                 android:onClick="onClickListener_Plus"
                 android:text="@string/plus"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
             <Button
                 android:id="@+id/btn_minus"
@@ -435,7 +432,7 @@
                 android:onClick="onClickListener_Minus"
                 android:text="@string/minus"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
 
         </LinearLayout>
@@ -458,7 +455,7 @@
                 android:onClick="onClickListener_Zero"
                 android:text="@string/zero"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
             <Button
                 android:id="@+id/btn_sign"
@@ -472,7 +469,7 @@
                 android:padding="1dp"
                 android:text="@string/sign"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
             <Button
                 android:id="@+id/btn_comma"
@@ -485,7 +482,7 @@
                 android:onClick="onClickListener_Comma"
                 android:text="@string/comma"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
             <Button
                 android:id="@+id/btn_mod"
@@ -498,7 +495,7 @@
                 android:onClick="onClickListener_Mod"
                 android:text="@string/modulo"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
             <Button
                 android:id="@+id/btn_equal"
@@ -511,7 +508,7 @@
                 android:text="@string/equal"
                 android:textAlignment="gravity"
                 android:textColor="@color/black"
-                android:textSize="45sp" />
+                android:textSize="@dimen/big_btn_text" />
 
         </LinearLayout>
 
