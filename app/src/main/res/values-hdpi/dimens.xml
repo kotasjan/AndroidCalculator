@@ -1,0 +1,8 @@
+<resources>
+	<dimen name="small_btn_text">27sp</dimen>
+	<dimen name="big_btn_text">35sp</dimen>
+	<dimen name="small_display_text">35sp</dimen>
+	<dimen name="big_display_text">42sp</dimen>
+
+	<dimen name="padding_backspace">10dp</dimen>
+</resources>

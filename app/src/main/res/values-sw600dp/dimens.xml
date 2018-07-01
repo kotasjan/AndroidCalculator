@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="small_btn_text">45sp</dimen>
+    <dimen name="big_btn_text">60sp</dimen>
+    <dimen name="small_display_text">65sp</dimen>
+    <dimen name="big_display_text">80sp</dimen>
+    
+    <dimen name="padding_backspace">27dp</dimen>
+
+</resources>
